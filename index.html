@@ -2538,7 +2538,7 @@ tbody td:has(.hit-check):hover{background:rgba(41,64,136,.055);}
    stays usable and rows appear in the list the moment they're checked */
 #drawerBg.open{background:transparent;pointer-events:none;}
 #drawerBg .drawer{pointer-events:auto;border-left:1px solid var(--border);box-shadow:-8px 0 24px rgba(33,37,43,.08);}
-.app-main{transition:margin-right .28s cubic-bezier(.4,0,.2,1);}
+.app-main{transition:margin-right var(--list-dur) var(--list-ease);}
 body.list-open .app-main{margin-right:480px;}
 @media (max-width:1100px){
   body.list-open .app-main{margin-right:0;}
@@ -2902,6 +2902,21 @@ textarea.text-input{border-radius:16px;min-height:88px;resize:vertical;line-heig
 /* Non-Lead is brand light blue everywhere (fills/dots #2ECCFF, darker ink for text on the tint) */
 .sl-pill.t-nl{background:var(--c-nl-lt);color:var(--c-nl-ink);}
 .sl-asset-dot.nl{background:var(--c-nl);}
+
+/* Build a List mode: rows add to the list on click */
+body.list-open #tableBody tr[data-id], body.list-open #tableBodyLoc tr[data-loc-id]{cursor:copy;}
+
+/* Verification Field Planner charts: bars at half width */
+.vp3h-bar,.mh-bar{width:50%;}
+
+/* Build a List panel: real slide in/out, synced with the page push and the scroll to the table */
+:root{--list-dur:460ms;--list-ease:cubic-bezier(.4,0,.2,1);}
+#drawerBg{display:block;visibility:hidden;pointer-events:none;background:transparent;transition:visibility 0s linear var(--list-dur);}
+#drawerBg.open{visibility:visible;transition:visibility 0s;}
+#drawerBg .drawer{transition:right var(--list-dur) var(--list-ease);}
+@media (prefers-reduced-motion: reduce){ #drawerBg .drawer,.app-main{transition:none;} #drawerBg{transition:none;} }
+.dr-foot-row .btn,.dr-foot-row .dr-more-wrap{flex:1 1 0;min-width:0;}
+.dr-foot-row .dr-more-btn{justify-content:center;gap:6px;}
 </style>
 <script>
 /* Calypso progress mark: a droplet filling and draining. size: '' (15px) | 'lg' (26px) | 'xl' (44px) */
@@ -3151,7 +3166,7 @@ function calApplyingPanel(title, msg){
       <span class="tbl-count" id="tblCount" hidden></span>
       <div class="tbl-tools">
         <button id="buildListBtn" class="btn-pill" type="button" aria-haspopup="dialog"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M9.6 2.6H12a.9.9 0 0 1 .9.9v9a.9.9 0 0 1-.9.9H4a.9.9 0 0 1-.9-.9v-9a.9.9 0 0 1 .9-.9h2.4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><rect x="6" y="1.8" width="4" height="2.4" rx=".7" stroke="currentColor" stroke-width="1.4"/><path d="m5.8 8.6 1.4 1.4 3-3.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Build a List <span class="ct num list-ct" hidden>0</span></button>
-        <button class="btn-pill filters-btn" type="button" aria-haspopup="dialog"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 3.5h11l-4.2 5v4.2l-2.6 1.3V8.5l-4.2-5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Filters <span class="ct num" hidden>0</span></button>
+        <button class="btn-pill filters-btn" id="invFiltersBtn" type="button" aria-haspopup="dialog"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 3.5h11l-4.2 5v4.2l-2.6 1.3V8.5l-4.2-5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Filters <span class="ct num" hidden>0</span></button>
         <button class="btn-pill btn-pill-icon" type="button" id="moreBtnInv" aria-haspopup="menu" aria-expanded="false" aria-label="More table actions" title="More"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="3.4" cy="8" r="1.3" fill="currentColor"/><circle cx="8" cy="8" r="1.3" fill="currentColor"/><circle cx="12.6" cy="8" r="1.3" fill="currentColor"/></svg></button>
       </div>
     </div>
@@ -3186,11 +3201,11 @@ function calApplyingPanel(title, msg){
         <span class="bulk-sep"></span>
         <button class="btn-bulk" id="bulkViewListBtn">View List</button>
         <div class="import-dropdown-wrap" id="bulkMoreWrap">
-          <button class="btn-bulk" id="bulkMoreBtn" aria-haspopup="menu" aria-expanded="false">Bulk Actions <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 10 4-4 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="btn-bulk" id="bulkMoreBtn" aria-haspopup="menu" aria-expanded="false">Actions <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 10 4-4 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <div class="import-dropdown-menu hidden" id="bulkMoreMenu" role="menu">
             <button class="import-dropdown-item" data-existing="Add to Program">Add to Program</button>
             <button class="import-dropdown-item" id="bulkSaveListBtnTop">Save as a List</button>
-            <button class="import-dropdown-item" data-existing="Send">Send</button>
+            <button class="import-dropdown-item" data-existing="Send Communication">Send Communication</button>
             <button class="import-dropdown-item" data-existing="Export my list">Export my list</button>
           </div>
         </div>
@@ -3292,7 +3307,7 @@ function calApplyingPanel(title, msg){
       <span class="tbl-count" id="tblCountLoc" hidden></span>
       <div class="tbl-tools">
         <button id="buildListBtnLoc" class="btn-pill" type="button" aria-haspopup="dialog"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M9.6 2.6H12a.9.9 0 0 1 .9.9v9a.9.9 0 0 1-.9.9H4a.9.9 0 0 1-.9-.9v-9a.9.9 0 0 1 .9-.9h2.4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><rect x="6" y="1.8" width="4" height="2.4" rx=".7" stroke="currentColor" stroke-width="1.4"/><path d="m5.8 8.6 1.4 1.4 3-3.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Build a List <span class="ct num list-ct" hidden>0</span></button>
-        <button class="btn-pill filters-btn" type="button" aria-haspopup="dialog"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 3.5h11l-4.2 5v4.2l-2.6 1.3V8.5l-4.2-5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Filters <span class="ct num" hidden>0</span></button>
+        <button class="btn-pill filters-btn" id="locFiltersBtn" type="button" aria-haspopup="dialog"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 3.5h11l-4.2 5v4.2l-2.6 1.3V8.5l-4.2-5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Filters <span class="ct num" hidden>0</span></button>
         <button class="btn-pill btn-pill-icon" type="button" id="moreBtnLoc" aria-haspopup="menu" aria-expanded="false" aria-label="More table actions" title="More"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="3.4" cy="8" r="1.3" fill="currentColor"/><circle cx="8" cy="8" r="1.3" fill="currentColor"/><circle cx="12.6" cy="8" r="1.3" fill="currentColor"/></svg></button>
       </div>
     </div>
@@ -3323,7 +3338,7 @@ function calApplyingPanel(title, msg){
         <span class="bulk-sep"></span>
         <button class="btn-bulk" id="bulkViewListBtnLoc">View List</button>
         <div class="import-dropdown-wrap" id="bulkMoreWrapLoc">
-          <button class="btn-bulk" id="bulkMoreBtnLoc" aria-haspopup="menu" aria-expanded="false">Bulk Actions <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 10 4-4 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="btn-bulk" id="bulkMoreBtnLoc" aria-haspopup="menu" aria-expanded="false">Actions <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 10 4-4 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <div class="import-dropdown-menu hidden" id="bulkMoreMenuLoc" role="menu">
             <button class="import-dropdown-item" data-existing="Assign to Program">Assign to Program</button>
             <button class="import-dropdown-item" data-existing="Send Communication">Send Communication</button>
@@ -3441,17 +3456,16 @@ function calApplyingPanel(title, msg){
     </div>
 
     <div class="drawer-foot hidden" id="drawerFoot">
-      <div class="dr-sec-title">Actions</div>
       <div class="foot-row dr-foot-row">
+        <button id="saveTagBtn" class="btn btn--secondary" type="button">Save as List</button>
       <div class="import-dropdown-wrap dr-more-wrap" id="drMoreWrap">
-        <button class="btn btn--secondary dr-more-btn" id="drMoreBtn" type="button" aria-haspopup="menu" aria-expanded="false">Bulk Actions <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 10 4-4 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="btn btn--secondary dr-more-btn" id="drMoreBtn" type="button" aria-haspopup="menu" aria-expanded="false">Actions <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 10 4-4 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="import-dropdown-menu hidden" id="drMoreMenu" role="menu">
           <button class="import-dropdown-item" data-act="Add to Program">Add to Program</button>
-          <button class="import-dropdown-item" data-act="Send">Send</button>
+          <button class="import-dropdown-item" data-act="Send Communication">Send Communication</button>
           <button class="import-dropdown-item" data-act="Export my list">Export my list</button>
         </div>
       </div>
-        <button id="saveTagBtn" class="btn btn--secondary" type="button">Save as List</button>
         <button id="bulkEditBtn" class="btn btn--primary" type="button">Edit</button>
       </div>
     </div>
@@ -3590,6 +3604,7 @@ function calApplyingPanel(title, msg){
       <div class="rec-acts">
         <button class="btn btn--secondary" type="button" id="rdEditBtn">Edit</button>
         <button class="btn btn--secondary" type="button" id="rdVerifyBtn">Verify Asset</button>
+        <button class="btn btn--secondary" type="button" id="rdReplaceBtn">Replace Asset</button>
         <button class="btn btn--secondary btn--icon" type="button" id="rdMoreBtn" aria-label="More actions" title="More actions"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="3.4" cy="8" r="1.25" fill="currentColor"/><circle cx="8" cy="8" r="1.25" fill="currentColor"/><circle cx="12.6" cy="8" r="1.25" fill="currentColor"/></svg></button>
       </div>
     </header>
@@ -6866,7 +6881,16 @@ function wHead(iconSvg,title,rightHtml=''){
 // below (its own IIFE), which owns its own filter-strip/search/sort. This indicator + clear-filter
 // banner is purely about the three *widget-driven* filters, which reach the table through the
 // window.setInventoryMatFilter/setInventoryScoreFilter bridge — see filterMat/filterBin/filterVP3Bucket.
-function updateFI(txt){const el=document.getElementById('fi');if(!txt){el.className='fi';return;}el.className='fi on';document.getElementById('fiText').textContent='Filtered by: '+txt;}
+// Chart-driven filters no longer show a "Filtered by" banner above the table; they count on
+// the Filters button like any other filter, e.g. "Filters (1)".
+function updateFI(txt){
+  const el=document.getElementById('fi'); if(el) el.className='fi';
+  const b=document.getElementById('invFiltersBtn'); if(!b) return;
+  const ct=b.querySelector('.ct'), n=txt?1:0;
+  if(ct){ ct.textContent=n; ct.hidden=!n; }
+  b.classList.toggle('on', !!n);
+  b.title = txt ? 'Filtered by '+txt : '';
+}
 function clearAll(){
   activeMat=null;activeBin=null;vp3ActiveBucket=null;
   document.querySelectorAll('.mat-leg-item').forEach(e=>e.classList.remove('active'));
@@ -9409,10 +9433,11 @@ function pwGateToggleVisibility(){
     $$('#tableBody tr[data-id]').forEach(function(tr){
       tr.addEventListener('click', function(e){
         if(e.target.closest('input, a, button, label')) return;
+        if(drawerOpen){ toggleRowInList(tr, '.row-check'); return; }
         openRowDetail(tr.getAttribute('data-id'));
       });
       tr.addEventListener('keydown', function(e){
-        if((e.key==='Enter' || e.key===' ') && e.target===tr){ e.preventDefault(); openRowDetail(tr.getAttribute('data-id')); }
+        if((e.key==='Enter' || e.key===' ') && e.target===tr){ e.preventDefault(); if(drawerOpen){ toggleRowInList(tr, '.row-check'); return; } openRowDetail(tr.getAttribute('data-id')); }
       });
     });
     renderFoot('inv', pg, rows.length, mockData.length, 'assets');
@@ -9444,6 +9469,14 @@ function pwGateToggleVisibility(){
   // "currently checked" state that drives this bulk bar (resets on search, see below) —
   // it's deliberately kept separate from myList's persistent membership so the in-list
   // highlight (.in-list, driven by isInList()) stays distinct from the checkbox tick.
+  // While the Build a List panel is open, a row click adds (or removes) that row from the list —
+  // the same path as its checkbox — instead of opening the detail flyout. The ID link still opens details.
+  function toggleRowInList(tr, sel){
+    var cb = tr.querySelector(sel);
+    if(!cb) return;
+    cb.checked = !cb.checked;
+    cb.dispatchEvent(new Event('change', {bubbles:true}));
+  }
   function onRowCheckChange(e){
     var id = e.target.getAttribute('data-id');
     if(e.target.checked){
@@ -9512,17 +9545,31 @@ function pwGateToggleVisibility(){
   bulkEditBtnTop.addEventListener('click', function(){ openEditModal(); });
   bulkSaveListBtnTop.addEventListener('click', function(){ bulkMoreMenu.classList.add('hidden'); if(myList.length===0) return; openTagModal(); });
   // View List: open the panel and bring the table into view, unless it's already near the top
+  // The panel slide, the page push and this scroll all run on the same duration and curve
+  // (--list-dur / --list-ease), starting on the same frame, so they land together. The target is
+  // re-measured every frame because the table moves while the widgets above it reflow.
+  var LIST_DUR = 460;
+  function listEase(x){ // cubic-bezier(.4,0,.2,1), solved numerically to match the CSS curve
+    var a=.4,b=0,c=.2,d=1, t=x;
+    for(var i=0;i<6;i++){ var u=1-t, bx=3*u*u*t*a+3*u*t*t*c+t*t*t-x, dx=3*u*u*a+6*u*t*(c-a)+3*t*t*(1-c); if(Math.abs(bx)<1e-4||!dx) break; t-=bx/dx; }
+    var v=1-t; return 3*v*v*t*b+3*v*t*t*d+t*t*t;
+  }
   function viewListAndScroll(pageSel){
-    openDrawer();
     var card = $(pageSel + ' .table-card');
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    openDrawer();
     if(!card) return;
-    // wait for the page to finish shifting left (widgets reflow while the panel opens) before measuring
-    setTimeout(function(){
-      var top = card.getBoundingClientRect().top;
-      if(Math.abs(top - 16) > 8){
-        window.scrollTo({ top: window.scrollY + top - 16, behavior: 'smooth' });
-      }
-    }, 320);
+    var target = function(){ return Math.min(window.scrollY + card.getBoundingClientRect().top - 16, document.documentElement.scrollHeight - innerHeight); };
+    var from = window.scrollY;
+    if(Math.abs(target() - from) < 8) return;
+    if(reduce){ window.scrollTo(0, target()); return; }
+    var t0 = null;
+    (function step(now){
+      if(t0 === null) t0 = now;
+      var p = Math.min(1, (now - t0) / LIST_DUR);
+      window.scrollTo(0, from + (target() - from) * listEase(p));
+      if(p < 1) requestAnimationFrame(step);
+    })(performance.now());
   }
   $('#bulkViewListBtn').addEventListener('click', function(){ viewListAndScroll('#pageInventory'); });
   $('#bulkViewListBtnLoc').addEventListener('click', function(){ viewListAndScroll('#pageLocations'); });
@@ -9757,6 +9804,7 @@ function pwGateToggleVisibility(){
     $$('#tableBodyLoc tr[data-loc-id]').forEach(function(tr){
       tr.addEventListener('click', function(e){
         if(e.target.closest('input, a, button, label')) return;
+        if(drawerOpen){ toggleRowInList(tr, '.row-check-loc'); return; }
         notImplemented('View location record');
       });
     });
@@ -9832,7 +9880,7 @@ function pwGateToggleVisibility(){
     refreshLocBulkBar();
   });
 
-  buildListBtnLoc.addEventListener('click', openDrawer);
+  buildListBtnLoc.addEventListener('click', function(){ viewListAndScroll('#pageLocations'); });
   dqReportBtn.addEventListener('click', function(){ notImplemented('Data Quality report'); });
 
   var importDropdownBtn = $('#importDropdownBtn');
@@ -9940,7 +9988,7 @@ function pwGateToggleVisibility(){
     renderItemCards();
   }
 
-  buildListBtn.addEventListener('click', openDrawer);
+  buildListBtn.addEventListener('click', function(){ viewListAndScroll('#pageInventory'); });
   dockViewListBtn.addEventListener('click', openDrawer);
   closeDrawerBtn.addEventListener('click', closeDrawer);
 
@@ -10230,6 +10278,7 @@ function pwGateToggleVisibility(){
     rdEditBtn.classList.toggle('is-on', slState.editAll);
     rdEditBtn.textContent = slState.editAll ? 'Editing…' : 'Edit';
     rdEditBtn.setAttribute('aria-pressed', String(slState.editAll));
+    rdVerifyBtn.textContent = current.kind === 'hy' ? 'Flushing' : 'Verify Asset';
     if(slState.tab === 'map') setTimeout(function(){ slInitMap(r); }, 30);
     else slDestroyMap();
   }
@@ -10351,6 +10400,7 @@ function pwGateToggleVisibility(){
   // Verify Asset — the verification steps run inside this flyout
   rdVerifyBtn.addEventListener('click', function(){
     var r = slCurrent(); if(!r) return;
+    if(slState.assetKey && slState.assetKey.indexOf('hy:') === 0){ notImplemented('Log a hydrant flushing'); return; }
     window._lvOnVerified = function(d){
       var x = slExtra(r);
       if(d.sysMat){ var old = r.sys; r.sys = d.sysMat; r.sysCls = slClsFor(d.sysMat); x.history.push({ what:'System-owned material', detail:(old||'Not recorded') + ' → ' + d.sysMat, by:'Cam Grundy (verification)', when: slNow() }); }
@@ -10364,11 +10414,12 @@ function pwGateToggleVisibility(){
     var title = document.getElementById('lvModalTitle'); if(title) title.textContent = 'Verify Service Line ' + r.id;
   });
 
-  // ⋯ — Replace Asset, Add to Program
+  // Replace Asset is its own button now; ⋯ keeps Add to Program
+  $('#rdReplaceBtn').addEventListener('click', function(){ notImplemented('Replace Asset'); });
   (function(){
     var menu = document.createElement('div');
     menu.className = 'import-dropdown-menu hidden'; menu.id = 'rdMoreMenu'; menu.setAttribute('role','menu');
-    menu.innerHTML = '<button class="import-dropdown-item" data-rdact="Replace Asset">Replace Asset</button><button class="import-dropdown-item" data-rdact="Add to Program">Add to Program</button>';
+    menu.innerHTML = '<button class="import-dropdown-item" data-rdact="Add to Program">Add to Program</button>';
     document.body.appendChild(menu);
     function close(){ menu.classList.add('hidden'); rdMoreBtn.setAttribute('aria-expanded','false'); }
     rdMoreBtn.setAttribute('aria-haspopup','menu');
@@ -11112,8 +11163,9 @@ function pwGateToggleVisibility(){
       if(!menu.classList.contains('hidden')){ close(); return; }
       var r = btn.getBoundingClientRect();
       menu.classList.remove('hidden');
-      menu.style.width = Math.max(r.width, 220) + 'px';
-      menu.style.left = r.left + 'px';
+      var w = Math.max(r.width, 220);
+      menu.style.width = w + 'px';
+      menu.style.left = Math.max(8, r.right - w) + 'px';
       menu.style.right = 'auto';
       menu.style.top = Math.max(8, r.top - menu.offsetHeight - 8) + 'px';
       btn.setAttribute('aria-expanded','true');
