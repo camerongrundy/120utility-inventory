@@ -687,7 +687,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   --border-2:#CFCFCF;
   --c-lead:#D70049;--c-lead-lt:#F9ECEB;
   --c-galv:#AE6400;--c-galv-lt:#FFF8E8;
-  --c-nl:#007F4A;--c-nl-lt:#E5F5EF;
+  --c-nl:#2ECCFF;--c-nl-lt:#E3F8FF;--c-nl-ink:#00739A;
   --c-unk:#294088;--c-unk-lt:#EFF2FB;
   /* Data visualization + severity ramp */
   --dv-blue:#4E5DA0;--dv-blue-mid:#3D5A96;--dv-navy:#2E4084;--dv-amber:#E08A1C;--dv-danger:#D53956;
@@ -958,7 +958,7 @@ a{color:inherit;}
 /* Bucket color dots */
 .bucket-lead{background:var(--c-lead);}
 .bucket-inc{background:var(--navy);}
-.bucket-nl{background:var(--green);}
+.bucket-nl{background:var(--c-nl);}
 
 /* ── WIDGET 2d: VP STATE 3 — histogram (matches Premium style) ── */
 .vp3h-wrap{flex:1;display:flex;flex-direction:column;justify-content:flex-end;margin-bottom:4px;}
@@ -1144,7 +1144,8 @@ tbody tr:hover td{background:var(--n600);}
 .badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
 .b-lead{background:var(--c-lead-lt);color:var(--c-lead);}
 .b-galv{background:var(--c-galv-lt);color:#AE6400;}
-.b-nl{background:var(--c-nl-lt);color:#294088;}
+.b-nl{background:var(--c-nl-lt);color:var(--c-nl-ink);}
+.b-nl::before{background:var(--c-nl);}
 .b-unk{background:var(--c-unk-lt);color:var(--navy);}
 .b-ab{background:var(--n600);color:var(--n800);}
 /* status pill/spill — straight from the 2026 design system: pill labels a card, spill (dot-chip) labels a row. Same four tokens everywhere. */
@@ -1185,7 +1186,7 @@ tbody tr:hover td{background:var(--n600);}
 .sp-simple{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:8px;}
 .sp-simple.sp-b-lead{background:var(--c-lead-lt);color:var(--c-lead);}
 .sp-simple.sp-b-unknown{background:var(--n600);color:var(--n800);}
-.sp-simple.sp-b-nonlead{background:var(--green-lt);color:var(--green);}
+.sp-simple.sp-b-nonlead{background:var(--c-nl-lt);color:var(--c-nl-ink);}
 .prog-link{font-size:11px;font-weight:600;color:var(--navy);text-decoration:none;display:block;}
 .prog-link:hover{text-decoration:underline;}
 .pg-wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:15px 18px;font-size:13px;color:var(--n800);border-top:1px solid var(--n700);}
@@ -2897,6 +2898,10 @@ textarea.text-input{border-radius:16px;min-height:88px;resize:vertical;line-heig
 .vp-train-actions .btn-vp-secondary{display:flex;align-items:center;justify-content:center;width:100%;min-height:40px;padding:10px 18px;border-radius:var(--btn-r,8px);font-size:14px;font-weight:600;text-decoration:none;transition:background .12s ease;}
 .vp-train-actions .btn-vp-secondary:hover{background:var(--brand-tint);}
 .vp-train-actions .btn-vp-secondary:focus-visible{outline:2px solid var(--brand);outline-offset:2px;}
+
+/* Non-Lead is brand light blue everywhere (fills/dots #2ECCFF, darker ink for text on the tint) */
+.sl-pill.t-nl{background:var(--c-nl-lt);color:var(--c-nl-ink);}
+.sl-asset-dot.nl{background:var(--c-nl);}
 </style>
 <script>
 /* Calypso progress mark: a droplet filling and draining. size: '' (15px) | 'lg' (26px) | 'xl' (44px) */
@@ -3855,7 +3860,7 @@ function getConfidenceTier(verifiedCount, target){
 // the original fine-grained gradient (not flattened to 3 colors) since that gradient is what makes
 // this premium view a "fuller confidence spectrum" rather than the 3-bar basic summary.
 const BINS=[
-  {label:'0–10%', lo:0, hi:10, count:185,  color:'#007F4A', zone:'Likely Non-Lead'},
+  {label:'0–10%', lo:0, hi:10, count:185,  color:'#2ECCFF', zone:'Likely Non-Lead'},
   {label:'10–20%',lo:10,hi:20, count:515,  color:'#4A7DBB', zone:'Likely Non-Lead'},
   {label:'20–30%',lo:20,hi:30, count:642,  color:'#294088', zone:'Likely Non-Lead'},
   {label:'30–40%',lo:30,hi:40, count:748,  color:'#294088', zone:'Likely Non-Lead'},
@@ -4421,7 +4426,7 @@ function switcherPredictionsHtml(){
       <div class="pm-box pm-box-compact pm-box-nodig" id="nodigBox"
         onmouseenter="showCalcTip()" onmouseleave="hideCalcTip()">
         <div class="pm-calc-tip" id="calcTip">
-          <div class="pm-calc-row"><span class="pm-calc-lbl">Likely Non-Lead (≤10%)</span><span class="pm-calc-val" style="color:#007F4A;">2,154</span></div>
+          <div class="pm-calc-row"><span class="pm-calc-lbl">Likely Non-Lead (≤10%)</span><span class="pm-calc-val" style="color:var(--c-nl-ink);">2,154</span></div>
           <div class="pm-calc-row"><span class="pm-calc-lbl">Likely Lead (≥70%)</span><span class="pm-calc-val" style="color:#E0899A;">693</span></div>
           <div class="pm-calc-row"><span class="pm-calc-lbl">Digs Avoided Total</span><span class="pm-calc-val" style="color:#8FC9A3;">2,847</span></div>
         </div>
@@ -5471,7 +5476,7 @@ function renderYBStep4(bodyId, footerId, inDrawer){
       <div style="padding:0 10px;font-size:13px;font-weight:600;color:var(--green);text-align:center;">${r.yearBuilt}</div>
       <div style="padding:0 10px;text-align:center;"><span style="font-size:11px;font-weight:700;color:${matColor};">${r.material}</span>${isLead?`<div style="font-size:9px;color:var(--amber-dk);margin-top:2px;font-weight:700;">⚠ Review</div>`:''}</div>
       <div style="padding:0 10px;text-align:center;">
-        <span style="font-size:11px;font-weight:700;color:var(--green);">Non-Lead Other</span>
+        <span style="font-size:11px;font-weight:700;color:var(--c-nl-ink);">Non-Lead Other</span>
         <div style="font-size:9px;color:var(--n800);margin-top:2px;line-height:1.3;">${whyText}</div>
       </div>
       <div style="padding:0 10px;text-align:center;font-size:11px;font-weight:700;color:var(--n900);">Age</div>
@@ -5624,7 +5629,7 @@ function renderYBCloseout(bodyId, footerId, inDrawer){
       <div style="display:grid;grid-template-columns:1fr 100px 120px;gap:0;align-items:center;">
         <div><div style="font-size:12px;font-weight:500;color:var(--n900);">${r.addr}</div><div style="font-size:10px;color:var(--n800);">${r.city}</div></div>
         <div style="font-size:11px;color:var(--n800);text-align:center;">${r.material}</div>
-        <div style="font-size:11px;font-weight:700;color:var(--green);text-align:center;">→ Non-Lead Other</div>
+        <div style="font-size:11px;font-weight:700;color:var(--c-nl-ink);text-align:center;">→ Non-Lead Other</div>
       </div>
       <div style="font-size:9px;color:var(--n800);margin-top:4px;line-height:1.5;">Updates system-owned and customer-owned material · Classification basis: <strong>Age</strong> · Removes required field verification</div>
     </div>`).join('');
@@ -8611,7 +8616,7 @@ function vpLineVerifStatus(idx, doneCount, isLead){
   if(isLead) return 'lead';
   return (idx % 4 === 0) ? 'galvanized' : 'nonlead';
 }
-const VP_VERIF_LABELS = {lead:{lbl:'Lead',color:'var(--c-lead)'},nonlead:{lbl:'Non-Lead',color:'var(--c-nl)'},galvanized:{lbl:'Galvanized',color:'var(--amber-dk)'}};
+const VP_VERIF_LABELS = {lead:{lbl:'Lead',color:'var(--c-lead)'},nonlead:{lbl:'Non-Lead',color:'var(--c-nl-ink)'},galvanized:{lbl:'Galvanized',color:'var(--amber-dk)'}};
 function openVPSummaryFlyout(){
   const name = window._vpProgName || '2026 High Priority Verification';
   const total = progData.monthlyCapacity || 100;
@@ -9416,8 +9421,8 @@ function pwGateToggleVisibility(){
   // ── ROW DETAIL FLYOUT ──
   function scoreDetail(score){
     if(score===null || score===undefined) return {color:'var(--n750)', cat:'Not scored', desc:'No prediction score on this record.'};
-    if(score<=10) return {color:'#007F4A', cat:'Likely Non-Lead', desc:'Qualifies for no-dig classification.'};
-    if(score<=40) return {color:'#007F4A', cat:'Likely Non-Lead', desc:'May qualify for no-dig with additional data.'};
+    if(score<=10) return {color:'#2ECCFF', cat:'Likely Non-Lead', desc:'Qualifies for no-dig classification.'};
+    if(score<=40) return {color:'#2ECCFF', cat:'Likely Non-Lead', desc:'May qualify for no-dig with additional data.'};
     if(score<=69) return {color:'#AE6400', cat:'Inconclusive', desc:'Physical verification recommended.'};
     return {color:'#D70049', cat:'Likely Lead', desc:'Prioritize for field verification.'};
   }
@@ -10028,7 +10033,7 @@ function pwGateToggleVisibility(){
   function slAssetsAt(r){
     var lines = mockData.filter(function(m){ return m.locId === r.locId; });
     var h = slHash(r.locId || r.id);
-    var list = lines.map(function(m){ return { kind:'sl', label:'Service Line', id:m.id, rec:m, tone: ({lead:'crit',galv:'warn',unk:'warn',nl:'ok'})[slClsFor(m.sys)] }; });
+    var list = lines.map(function(m){ return { kind:'sl', label:'Service Line', id:m.id, rec:m, tone: ({lead:'crit',galv:'warn',unk:'warn',nl:'nl'})[slClsFor(m.sys)] }; });
     if(h % 3 !== 1) list.push({ kind:'bf', label:'Backflow', id:'BF-' + String(h % 900 + 100), tone: (h % 2 ? 'crit' : 'ok'),
       fields:[['Device type','Reduced pressure zone (RPZ)'],['Size','3/4"'],['Last test','Apr 2, 2025'],['Test result', h % 2 ? 'Overdue' : 'Passed'],['Next test due', h % 2 ? 'Apr 2, 2026' : 'Apr 2, 2027'],['Tester','Great Lakes Backflow Co.']] });
     if(h % 4 !== 0) list.push({ kind:'hy', label:'Hydrant', id:'HY-' + String((h >>> 3) % 900 + 100), tone:'ok',
@@ -10205,7 +10210,7 @@ function pwGateToggleVisibility(){
     rdTitle.textContent = 'Service Line ' + r.id;
     rdSub.textContent = 'External ID ' + (r.extId || 'Not recorded');
     var matLbl = ({lead:'Lead', galv:'Galvanized', nl:'Non-lead', unk:'Material unknown'})[r.epaCls] || 'Material unknown';
-    var matTone = ({lead:'crit', galv:'warn', nl:'ok', unk:'brand'})[r.epaCls] || 'brand';
+    var matTone = ({lead:'crit', galv:'warn', nl:'nl', unk:'brand'})[r.epaCls] || 'brand';
     var assets = slAssetsAt(r);
     var current = assets.filter(function(a){ return (a.kind + ':' + a.id) === slState.assetKey; })[0] || assets[0];
     slState.assetKey = current.kind + ':' + current.id;
