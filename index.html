@@ -3728,6 +3728,16 @@ body.rd-resizing,body.rd-resizing *{cursor:col-resize !important;user-select:non
   .sidebar .nav-sub{margin-left:26px !important;}
   .sidebar .side-foot{margin-top:14px !important;}
 }
+
+.m-sheet-x{display:none;}
+@media (max-width:920px){
+  .m-sheet-x{display:grid;place-items:center;position:fixed;left:50%;margin-left:-22px;z-index:1710;width:44px;height:44px;border-radius:50%;border:0;
+    background:none;color:var(--text);cursor:pointer;box-shadow:none;filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 6px rgba(255,255,255,.9));
+    opacity:0;transform:translateY(10px) scale(.9);pointer-events:none;transition:opacity .2s ease,transform .3s var(--fly-ease),top .25s var(--fly-ease);}
+  .m-sheet-x.show{opacity:1;transform:none;pointer-events:auto;}
+  .m-sheet-x:active{transform:scale(.94);}
+  .m-sheet-x:focus-visible{outline:2px solid var(--brand);outline-offset:2px;}
+}
 </style>
 <script>
 /* Calypso progress mark: a droplet filling and draining. size: '' (15px) | 'lg' (26px) | 'xl' (44px) */
@@ -9367,6 +9377,30 @@ buildWidgets();
   const ts = document.getElementById('tableSearch'), tsFull = ts ? ts.placeholder : '';
   function syncPh(){ if(ts) ts.placeholder = mq.matches ? 'Search address or ID' : tsFull; }
   syncPh(); mq.addEventListener('change', syncPh);
+  // ---- hovering close button above menu sheets (⋯, Actions, Filters, Columns…) ----
+  const mx = document.createElement('button'); mx.type = 'button'; mx.className = 'm-sheet-x'; mx.setAttribute('aria-label', 'Close menu');
+  mx.innerHTML = '<svg width="26" height="26" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4.4 4.4 7.2 7.2M11.6 4.4l-7.2 7.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+  document.body.appendChild(mx);
+  let mxTarget = null;
+  const ro = new ResizeObserver(() => placeX());
+  function openMenu(){ if(document.body.classList.contains('m-nav-open')) return side; return document.querySelector('.rowmenu') || [...document.querySelectorAll('.import-dropdown-menu:not(.hidden)')].find(m => m.offsetParent !== null || getComputedStyle(m).position === 'fixed'); }
+  function placeX(){
+    const m = mq.matches ? openMenu() : null;
+    if(m !== mxTarget){ if(mxTarget) ro.unobserve(mxTarget); mxTarget = m; if(m) ro.observe(m); }
+    if(!m){ mx.classList.remove('show'); return; }
+    const r = m.getBoundingClientRect();
+    mx.style.top = Math.max(8, (m === side && document.body.classList.contains('m-nav-open') ? side.getBoundingClientRect().top - (parseFloat(getComputedStyle(side).transform.split(',')[5]) || 0) : r.top) - 58) + 'px';
+    mx.classList.add('show');
+  }
+  new MutationObserver(() => requestAnimationFrame(placeX)).observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:['class'] });
+  mx.addEventListener('click', e => {
+    e.stopPropagation();
+    const m = openMenu(); if(!m) return;
+    if(m === side){ setNav(false); placeX(); return; }
+    if(m.classList.contains('rowmenu')) document.dispatchEvent(new KeyboardEvent('keydown', { key:'Escape', bubbles:true }));
+    else { m.classList.add('hidden'); document.querySelectorAll('[aria-expanded="true"][aria-haspopup="menu"]').forEach(b => b.setAttribute('aria-expanded', 'false')); }
+    placeX();
+  });
   // leaving mobile resets transient state
   mq.addEventListener('change', e => { if(!e.matches) setNav(false); });
 })();
