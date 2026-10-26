@@ -3634,7 +3634,8 @@ body.rd-resizing,body.rd-resizing *{cursor:col-resize !important;user-select:non
   .m-actionbar .btn{min-height:46px;}
   .m-actionbar .btn--icon{width:46px;flex:none;}
   .m-actionbar .btn--primary{flex:1;justify-content:center;font-size:15px;}
-  body:has(.bulk-bar:not(.hidden)) .m-actionbar,body.m-nav-open .m-actionbar{transform:translateY(110%);opacity:0;pointer-events:none;}
+  body:has(.bulk-bar:not(.hidden)) .m-actionbar,body.m-nav-open .m-actionbar,
+  body:has(.drawer-bg.open,.fde-flyout-bg.open,.geo-flyout-bg.open,.dq-drawer-bg.open,.modal-bg.open,.prog-modal-bg.open) .m-actionbar{transform:translateY(110%);opacity:0;pointer-events:none;}
   .page-body{padding-bottom:calc(96px + env(safe-area-inset-bottom)) !important;}
   .bulk-bar:not(.hidden){bottom:calc(8px + env(safe-area-inset-bottom)) !important;}
   .bu-dock{bottom:calc(84px + env(safe-area-inset-bottom)) !important;}
@@ -3738,6 +3739,42 @@ body.rd-resizing,body.rd-resizing *{cursor:col-resize !important;user-select:non
   .m-sheet-x:active{transform:scale(.94);}
   .m-sheet-x:focus-visible{outline:2px solid var(--brand);outline-offset:2px;}
 }
+
+/* Location summary: physical + mailing side by side, primary contact */
+.loc-addrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px 24px;}
+.loc-sub{font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.sl-card .loc-sub + .sl-grid{margin-top:6px;}
+.loc-mail-edit{margin-top:14px;}
+.loc-same{margin-top:12px;font-size:14px;}
+.loc-same-txt{font-size:15px;color:var(--text-2);}
+.loc-pc{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.loc-pc .sl-avatar{flex:none;}
+.loc-pc-body{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.loc-pc-body b{font-size:15px;font-weight:600;color:var(--text);}
+.loc-pc-body span{font-size:13px;color:var(--text-2);}
+/* locked, system-calculated fields */
+/* system-calculated fields (Calypso pain point 05): lock glyph on the label, flat fill + dashed
+   edge when editing, and a dark tooltip on hover/focus that says why it can't change */
+.sl-sys{position:relative;cursor:not-allowed;border-radius:6px;}
+.sl-sys:focus-visible{outline:2px solid var(--brand);outline-offset:4px;}
+.sl-lock-ico{display:inline-grid;vertical-align:-2px;margin-left:6px;color:var(--text-3);}
+.sl-locked{background:var(--btn-disabled-face) !important;border:1px dashed var(--btn-disabled-line);color:var(--btn-disabled-ink) !important;}
+.sl-lockmsg{position:absolute;left:0;bottom:calc(100% + 8px);z-index:30;width:max-content;max-width:260px;
+  background:var(--text);color:#fff;border-radius:8px;padding:8px 11px;font-size:12.5px;font-weight:500;line-height:1.45;
+  opacity:0;visibility:hidden;transform:translateY(3px);transition:opacity .13s ease,visibility .13s,transform .18s var(--fly-ease);pointer-events:none;
+  box-shadow:0 10px 26px rgba(33,37,43,.22);}
+.sl-lockmsg b{font-weight:700;}
+.sl-lockmsg::after{content:"";position:absolute;top:100%;left:16px;border:6px solid transparent;border-top-color:var(--text);}
+.sl-sys:hover .sl-lockmsg,.sl-sys:focus-visible .sl-lockmsg,.sl-sys:focus .sl-lockmsg{opacity:1;visibility:visible;transform:none;}
+.sl-grid .sl-sys:nth-child(2n) .sl-lockmsg{left:auto;right:0;}
+.sl-grid .sl-sys:nth-child(2n) .sl-lockmsg::after{left:auto;right:16px;}
+/* data quality: last run */
+.dq-title-row{display:flex;align-items:center;gap:8px;}
+.dq-info{position:relative;display:inline-grid;place-items:center;width:24px;height:24px;margin-left:2px;flex:none;color:var(--text-3);cursor:help;border-radius:50%;}
+.dq-info:hover,.dq-info:focus-visible{color:var(--brand);background:var(--surface-3);outline:none;}
+.dq-info::after{content:attr(data-tip);position:absolute;left:-8px;top:calc(100% + 8px);width:230px;padding:10px 12px;border-radius:8px;background:var(--surface);border:1px solid var(--border);box-shadow:0 8px 24px rgba(16,24,40,.14);font-size:12px;font-weight:400;line-height:1.45;color:var(--text-2);text-transform:none;letter-spacing:0;white-space:normal;font-variant-numeric:tabular-nums;opacity:0;transform:translateY(-4px);pointer-events:none;transition:opacity .15s ease,transform .2s cubic-bezier(.22,1,.36,1);z-index:40;}
+.dq-info:hover::after,.dq-info:focus-visible::after,.dq-info:focus::after{opacity:1;transform:none;}
+.w-head-left .dq-info::after{left:auto;right:-8px;}
 </style>
 <script>
 /* Calypso progress mark: a droplet filling and draining. size: '' (15px) | 'lg' (26px) | 'xl' (44px) */
@@ -4602,7 +4639,7 @@ function calApplyingPanel(title, msg){
   <div class="fde-flyout" id="fdeFlyout">
     <div class="fde-fly-head">
       <div>
-        <div class="fde-fly-title" id="fdeFlyTitle">Fix Data Errors</div>
+        <div class="dq-title-row"><div class="fde-fly-title" id="fdeFlyTitle">Fix Data Errors</div><span class="dq-info" id="fdeFlyRun" tabindex="0" role="img"></span></div>
         <div class="fde-fly-sub" id="fdeFlyoutSub">Your planner is locked because some records have missing or invalid data. Fix the issues below to activate it.</div>
       </div>
       <button class="btn-close" id="fdeFlyClose" onclick="closeFDEFlyout()" style="flex-shrink:0;margin-left:12px;margin-top:2px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
@@ -5503,9 +5540,10 @@ function buildDQ(){
     </button>`;
   }).join('');
   const sub = needCount === 0 ? 'All checks passed' : `${needCount} of ${DQ.length} checks need attention`;
+  const runTip = 'Checks last ran ' + dqLastRun() + '. They run every night.';
   el.innerHTML = `<div class="dq-head2">
       <div class="dq-head2-l">
-        <div class="w-head-left"><div class="w-head-icon">${icon}</div><span class="w-head-title">Service Line Data Quality</span></div>
+        <div class="w-head-left"><div class="w-head-icon">${icon}</div><span class="w-head-title">Service Line Data Quality</span><span class="dq-info" tabindex="0" role="img" aria-label="${runTip}" data-tip="${runTip}">${DQ_INFO}</span></div>
         <div class="dq-head2-sub">${sub}</div>
       </div>
     </div>
@@ -7986,7 +8024,14 @@ function updateRerunButtonState(){
 }
 
 // ── FDE FLYOUT ──
+// When the nightly data quality checks last ran (prototype: today at 6:00 AM)
+const DQ_INFO = '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.2v3.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5" r=".9" fill="currentColor"/></svg>';
+function dqLastRun(){
+  const d = new Date(); d.setHours(6,0,0,0);
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' at 6:00 AM';
+}
 function openFDEFlyout(drillTo, mode){
+  const run = document.getElementById('fdeFlyRun'); if(run){ const t = 'Checks last ran ' + dqLastRun() + '. They run every night.'; run.innerHTML = DQ_INFO; run.setAttribute('data-tip', t); run.setAttribute('aria-label', t); }
   const bg=document.getElementById('fdeFlyoutBg');
   bg.classList.add('open');
   document.body.style.overflow='hidden';
@@ -11354,26 +11399,26 @@ function pwGateToggleVisibility(){
     var x = slExtra(r);
     return {
       summary: { title:'Summary', fields:[
+        ['epa','EPA material classification','select','epa',{accent:true}], ['x.basis','EPA classification basis','select','basis'],
         ['status','Status','select','status'], ['own','Ownership','select','own'],
-        ['epa','EPA material classification','select','epa',{accent:true}], ['x.install','Installation date','year'],
-        ['x.basis','EPA classification basis','select','basis'], ['x.pool','Validation pool status','select','pool'],
         ['x.visual','Visual verification','select','visual'], ['x.verifDate','Verification date','date'],
+        ['x.install','Installation date','year'], ['x.pool','Validation pool status','select','pool'],
         ['x.desc','Description','textarea',null,{full:true}]
       ], more:[
         ['extId','External ID','text'], ['lcr','LCR tier','select','lcr'],
         ['conn','Connector present','select','conn'], ['programs','Program','select','programs'],
-        ['leadRisk','Lead risk','readonly',null,{hint:'Calculated by the prediction model.'}], ['id','120Water ID','readonly',null,{hint:'Assigned by 120Water.'}]
+        ['leadRisk','Lead risk','readonly',null,{lock:'Lead risk comes from the prediction model.'}], ['id','120Water ID','readonly',null,{lock:'The 120Water ID is assigned when the record is created.'}]
       ]},
       sys: { title:'System-owned service line', fields:[
-        ['sys','Material','select','sys',{accent:true}], ['x.sysInstall','Installation date','year'],
+        ['sys','Material','select','sys',{accent:true}], ['x.sysBasis','Classification basis','select','basis'],
+        ['x.sysMethod','Verification method','select','method'], ['x.sysInstall','Installation date','year'],
         ['x.sysDiam','Diameter','select','diam'], ['x.sysPrevLead','Previously lead','select','yn'],
-        ['x.sysSolder','Lead solder','select','yn'], ['x.sysBasis','Classification basis','select','basis'],
-        ['x.sysMethod','Verification method','select','method']
+        ['x.sysSolder','Lead solder','select','yn']
       ]},
       cust: { title:'Customer-owned service line', fields:[
-        ['cust','Material','select','cust',{accent:true}], ['x.custInstall','Installation date','year'],
-        ['x.custDiam','Diameter','select','diam'], ['x.custPrevLead','Previously lead','select','yn'],
-        ['x.custBasis','Classification basis','select','basis'], ['x.custMethod','Verification method','select','method']
+        ['cust','Material','select','cust',{accent:true}], ['x.custBasis','Classification basis','select','basis'],
+        ['x.custMethod','Verification method','select','method'], ['x.custInstall','Installation date','year'],
+        ['x.custDiam','Diameter','select','diam'], ['x.custPrevLead','Previously lead','select','yn']
       ]},
       custom: { title:'Custom fields', fields:[
         ['x.cfWorkOrder','Work order #','text'], ['x.cfPriority','Replacement priority','select','priority'],
@@ -11395,26 +11440,19 @@ function pwGateToggleVisibility(){
         ['x.pcAlt','Alternative phone','text'], ['x.pcEmail','Email','text']
       ]},
       lprofile: { title:'Profile', fields:[
+        ['x.prop','Property classification','select','prop'], ['x.sensitive','Sensitive population','select','yesno'],
         ['lcr','LCR Tier','select','lcr',{help:'Lead and Copper Rule sampling tier for this location. This becomes the LCRI Tier when the LCR Improvements take effect.'}],
-        ['x.prop','Property classification','select','prop'],
-        ['x.sensitive','Sensitive population','select','yesno'], ['x.disadv','Disadvantaged community','select','yn'],
+        ['x.disadv','Disadvantaged community','select','yn'],
         ['x.bldSolder','Building plumbing contains lead solder','select','yn']
       ], more:[
         ['x.persons','Persons in the home','text'], ['x.pou','POU/POUE treatment','select','yesno'], ['x.lcrSite','Current LCR sampling site','select','yesno']
       ]},
-      laddr: { title:'Address & mailing', fields:[
-        ['x.locName','Location name','text'], ['x.custId','Customer ID','text'],
-        ['x.gisId','GIS location ID','text'], ['x.dwelr','DWELR code','text'],
-        ['x.mailLine','Mailing address','computed',null,{full:true, viewOnly:true, compute:function(r){ var x = slExtra(r); if(x.mailSame === 'Yes') return 'Same as location'; return [x.mailAddr, x.mailAddr2, [x.mailCity, [x.mailState, x.mailZip].filter(Boolean).join(' ')].filter(Boolean).join(', ')].filter(Boolean).join(', ') || 'Not recorded'; }}],
-        ['x.mailSame','Mailing address is the same as the location address','checkbox',null,{full:true, editOnly:true}],
-        ['x.mailAddr','Mailing address','text',null,{full:true, editOnly:true, when:'mail'}],
-        ['x.mailAddr2','Mailing address line 2','text',null,{full:true, editOnly:true, when:'mail'}],
-        ['x.mailCity','Mailing city','text',null,{editOnly:true, when:'mail'}],
-        ['x.mailState','Mailing state','text',null,{editOnly:true, when:'mail'}],
-        ['x.mailZip','Mailing zip','text',null,{editOnly:true, when:'mail'}]
+      laddr: { title:'Address details', fields:[
+        ['x.locName','Location name','text'], ['x.custId','Customer ID','text']
       ], more:[
-        ['x.addrScore','Address verification score','readonly',null,{hint:'System calculated.'}],
-        ['x.mailScore','Mailing verification score','readonly',null,{hint:'System calculated.'}]
+        ['x.gisId','GIS location ID','text'], ['x.dwelr','DWELR code','text'],
+        ['x.addrScore','Address verification score','readonly',null,{lock:'Scored by address verification.'}],
+        ['x.mailScore','Mailing verification score','readonly',null,{lock:'Scored by address verification.'}]
       ]},
       lparcel: { title:'Parcel information', fields:[
         ['x.parcel','Parcel number','text'], ['x.yearBuilt','Year built','year'],
@@ -11464,6 +11502,7 @@ function pwGateToggleVisibility(){
     return '<input class="sn-addr-edit" '+data+' value="'+escapeHtml(v||'')+'">';
   }
   var SL_HELP = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M6.4 6.2a1.7 1.7 0 0 1 3.3.5c0 1.1-1.6 1.4-1.6 2.4M8 11.2v.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+  var SL_LOCK = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3.2" y="7" width="9.6" height="6.8" rx="1.6" stroke="currentColor" stroke-width="1.4"/><path d="M5.4 7V5.2a2.6 2.6 0 0 1 5.2 0V7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
   function slFieldHtml(r, f, cardKey, editing){
     var o = f[4] || {};
     if(o.viewOnly && editing) return '';
@@ -11482,6 +11521,12 @@ function pwGateToggleVisibility(){
       : matKey ? '<div class="sl-val">' + badgeHtml(escapeHtml(slDisplay(r, f)), f[0] === 'epa' ? r.epaCls : slClsFor(slGet(r, f[0]) || '')) + '</div>'
       : '<div class="sl-val' + (o.accent ? ' accent' : '') + '">' + escapeHtml(slDisplay(r, f)) + '</div>';
     var help = o.help ? ' <span class="sl-help" tabindex="0" role="img" aria-label="'+escapeHtml(o.help)+'" data-tip="'+escapeHtml(o.help)+'">'+SL_HELP+'</span>' : '';
+    if(o.lock) help += '<span class="sl-lock-ico">'+SL_LOCK+'</span>';
+    if(o.lock){
+      // system-calculated: locked look in edit mode, and the same explanation on hover in both modes (Calypso pain point 05)
+      var msg = '<b>System calculated.</b> Fields like this can\'t be edited. ' + escapeHtml(o.lock);
+      return '<div class="'+cls+' sl-sys" tabindex="0" aria-label="'+escapeHtml(f[1] + ': ' + slDisplay(r, f) + '. System calculated, can\'t be edited. ' + o.lock)+'"><div class="sl-lbl">'+f[1]+help+'</div>'+val+'<span class="sl-lockmsg" aria-hidden="true">'+msg+'</span></div>';
+    }
     return '<div class="'+cls+'"><div class="sl-lbl">'+f[1]+help+'</div>'+val+((editing && o.hint) ? '<div class="sl-hint">'+o.hint+'</div>' : '')+'</div>';
   }
   function slCardHtml(r, cardKey, card){
@@ -11510,30 +11555,56 @@ function pwGateToggleVisibility(){
     var edit = (!editing) ? '<button type="button" class="sl-card-edit" data-edit="'+cardKey+'">Edit</button>' : (slState.editAll ? '' : '<span class="sl-card-editing">Editing</span>');
     return '<section class="sl-card' + (editing ? ' is-editing' : '') + '" data-cardkey="'+cardKey+'"><div class="sl-card-head"><h4>'+title+'</h4>'+edit+'</div>'+body(editing)+foot+'</section>';
   }
+  function slPrimaryContact(x){
+    // the Contacts tab lists the primary contact first, then everyone else; Summary shows that first one
+    if(x.pcName) return { name:x.pcName, role:'Primary contact', method:x.pcMethod, lang:x.pcLang, phone:x.pcPhone, email:x.pcEmail };
+    var c = x.contacts && x.contacts[0];
+    return c ? { name:c.name, role:c.role, phone:c.phone, email:c.email } : null;
+  }
+  function slMailText(x){
+    return [x.mailAddr, x.mailAddr2, [x.mailCity, [x.mailState, x.mailZip].filter(Boolean).join(' ')].filter(Boolean).join(', ')].filter(Boolean);
+  }
   function slLocSummaryHtml(r){
     var x = slExtra(r);
     return slCardShell(r, 'lsummary', 'Summary', function(editing){
       var lsel = x.linkedLocs ? x.linkedLocs[Math.min(slState.locSel||0, x.linkedLocs.length-1)] : null;
       var tags = '<span class="badge badge-property">' + escapeHtml(lsel ? 'Multi-Family Residence' : (x.prop || 'Not classified')) + '</span>'
-        + (lsel ? '<span class="loc-tag">' + lsel.units + ' units</span><span class="loc-tag">' + lsel.locId + '</span>' : '')
-        + '<span class="loc-tag">' + (r.lcr && r.lcr !== '--' ? 'LCR Tier ' + escapeHtml(r.lcr) : 'No LCR tier') + '</span>'
         + (x.sensitive === 'Yes' ? '<span class="loc-tag warn">Sensitive population</span>' : '')
+        + '<span class="loc-tag">' + (r.lcr && r.lcr !== '--' ? 'LCR Tier ' + escapeHtml(r.lcr) : 'No LCR tier') + '</span>'
+        + (lsel ? '<span class="loc-tag">' + lsel.units + ' units</span><span class="loc-tag">' + lsel.locId + '</span>' : '')
         + (x.yearBuilt ? '<span class="loc-tag">Built ' + escapeHtml(x.yearBuilt) + '</span>' : '');
-      var addr = editing
-        ? '<div class="sl-grid">' + slFieldHtml(r, ['address','Address','text',null,{full:true}], 'lsummary', true)
-            + slFieldHtml(r, ['x.addr2','Address line 2','text',null,{full:true}], 'lsummary', true)
-            + slFieldHtml(r, ['x.cityName','City','text'], 'lsummary', true)
-            + slFieldHtml(r, ['x.stzip','State / Zip','stzip'], 'lsummary', true) + '</div>'
-        : '<div class="loc-addr"><b>' + escapeHtml(r.address) + '</b>' + ((x.linkedLocs || x.addr2) ? '<span>' + escapeHtml(x.linkedLocs ? x.linkedLocs[Math.min(slState.locSel||0, x.linkedLocs.length-1)].unit + (x.addr2 ? ', ' + x.addr2 : '') : x.addr2) + '</span>' : '')
-            + '<span>' + escapeHtml([x.cityName, [x.state, x.zip].filter(Boolean).join(' ')].filter(Boolean).join(', ')) + '</span></div>';
+      var same = x.mailSame === 'Yes';
+      var sameBox = '<label class="sl-check loc-same"><input type="checkbox" data-k="x.mailSame" data-toggles="mail"' + (editing ? ' data-card="lsummary"' : ' data-mailsame="1"') + (same ? ' checked' : '') + '> Mailing address is the same as physical address</label>';
+      var addr;
+      if(editing){
+        var mf = function(f){ return slFieldHtml(r, f, 'lsummary', true); };
+        addr = '<div class="loc-sub">Physical address</div><div class="sl-grid">' + mf(['address','Address','text',null,{full:true}])
+            + mf(['x.addr2','Address line 2','text',null,{full:true}])
+            + mf(['x.cityName','City','text']) + mf(['x.stzip','State / Zip','stzip']) + '</div>'
+          + sameBox
+          + '<div class="loc-mail-edit" data-when="mail"' + (same ? ' hidden' : '') + '><div class="loc-sub">Mailing address</div><div class="sl-grid">'
+            + mf(['x.mailAddr','Mailing address','text',null,{full:true}]) + mf(['x.mailAddr2','Mailing address line 2','text',null,{full:true}])
+            + mf(['x.mailCity','City','text']) + mf(['x.mailState','State','text']) + mf(['x.mailZip','Zip','text']) + '</div></div>';
+      } else {
+        var unit = (x.linkedLocs || x.addr2) ? '<span>' + escapeHtml(x.linkedLocs ? lsel.unit + (x.addr2 ? ', ' + x.addr2 : '') : x.addr2) + '</span>' : '';
+        var mail = slMailText(x);
+        addr = '<div class="loc-addrs">'
+          + '<div class="loc-addr"><div class="loc-sub">Physical address</div><b>' + escapeHtml(r.address) + '</b>' + unit
+            + '<span>' + escapeHtml([x.cityName, [x.state, x.zip].filter(Boolean).join(' ')].filter(Boolean).join(', ')) + '</span></div>'
+          + '<div class="loc-addr"><div class="loc-sub">Mailing address</div>'
+            + (same ? '<span class="loc-same-txt">Same as physical address</span>'
+                    : (mail.length ? '<b>' + escapeHtml(mail[0]) + '</b>' + mail.slice(1).map(function(l){ return '<span>' + escapeHtml(l) + '</span>'; }).join('') : '<span class="loc-same-txt">Not recorded</span>'))
+          + '</div></div>';
+      }
       var note = editing ? '<p class="loc-note">Tags update from Profile and Parcel information. The contact is edited in Contacts.</p>' : '';
-      var contact = x.pcName
-        ? '<div class="loc-contact"><div class="loc-contact-head"><span>Primary contact</span><button type="button" class="link-btn" data-gocontacts="1">Edit in Contacts</button></div><div class="sl-grid">'
-          + [['Name', x.pcName], ['Preferred contact method', x.pcMethod], ['Primary language', x.pcLang], ['Phone', x.pcPhone]]
-              .concat(x.pcAlt ? [['Alternative phone', x.pcAlt]] : []).concat([['Email', x.pcEmail || 'Not recorded']])
-              .map(function(p){ return '<div class="sl-field"><div class="sl-lbl">'+p[0]+'</div><div class="sl-val">'+escapeHtml(p[1])+'</div></div>'; }).join('')
-          + '</div></div>'
-        : '';
+      var pc = slPrimaryContact(x), nC = (x.pcName ? 1 : 0) + (x.contacts ? x.contacts.length : 0);
+      var contact = '<div class="loc-contact"><div class="loc-contact-head"><span>Primary contact</span><button type="button" class="link-btn" data-gocontacts="1">' + (nC > 1 ? 'View all ' + nC + ' contacts' : 'View in Contacts') + '</button></div>'
+        + (pc
+          ? '<div class="loc-pc"><span class="sl-avatar">' + pc.name.split(' ').map(function(p){ return p[0]; }).join('').slice(0,2) + '</span><div class="loc-pc-body"><b>' + escapeHtml(pc.name) + '</b><span>' + escapeHtml(pc.role) + (pc.method ? ' · Prefers ' + escapeHtml(String(pc.method).toLowerCase()) : '') + '</span></div></div>'
+            + '<div class="sl-grid loc-pc-grid">' + [['Phone', pc.phone], ['Email', pc.email]].concat(pc.lang ? [['Primary language', pc.lang]] : [])
+                .map(function(p){ return '<div class="sl-field"><div class="sl-lbl">'+p[0]+'</div><div class="sl-val">'+escapeHtml(p[1] || 'Not recorded')+'</div></div>'; }).join('') + '</div>'
+          : '<p class="sl-muted">No contacts at this location yet.</p>')
+        + '</div>';
       return addr + '<div class="loc-tags">' + tags + '</div>' + note + contact;
     });
   }
@@ -11736,8 +11807,8 @@ function pwGateToggleVisibility(){
       if(key === 'epa') r.epaCls = slClsFor(v);
       if(key === 'sys') r.sysCls = slClsFor(v);
       if(key === 'cust') r.custCls = slClsFor(v);
-      var labelEl = c[3].closest('.sl-field') ? c[3].closest('.sl-field').querySelector('.sl-lbl') : null;
-      x.history.push({ what: labelEl ? labelEl.textContent : key, detail: (c[1] || 'Not recorded') + ' → ' + (v || 'Not recorded'), by:'Cam Grundy', when: slNow(), k:key, ov:(c[1] == null ? '' : String(c[1])), nv:v });
+      var fld = c[3].closest('.sl-field'), labelEl = (fld && fld.querySelector('.sl-lbl')) || c[3].closest('label');
+      x.history.push({ what: labelEl ? labelEl.textContent.trim() : key, detail: (c[1] || 'Not recorded') + ' → ' + (v || 'Not recorded'), by:'Cam Grundy', when: slNow(), k:key, ov:(c[1] == null ? '' : String(c[1])), nv:v });
     });
     if(changes.some(function(c){ return c[0]==='x.cityName' || c[0]==='x.state' || c[0]==='x.zip'; })) r.city = snBuildCityStateZip(x.cityName, x.state, x.zip);
     return changes.length;
@@ -11802,9 +11873,22 @@ function pwGateToggleVisibility(){
     if(e.target.closest('[data-reqkit]')){ notImplemented('Request sample kit'); return; }
   });
   rdBody.addEventListener('change', function(e){
+    if(e.target.matches('[data-mailsame]')){
+      var rm = slCurrent(); if(!rm) return; var xm = slExtra(rm);
+      if(e.target.checked){
+        xm.history.push({ what:'Mailing address is the same as physical address', detail:'No → Yes', by:'Cam Grundy', when: slNow(), k:'x.mailSame', ov:'No', nv:'Yes' });
+        xm.mailSame = 'Yes'; slRender(rm); toast('Mailing address now matches the physical address.');
+      } else {
+        xm.mailSame = 'No'; slState.editing.lsummary = true; slRender(rm); xm.mailSame = 'Yes';
+        var mi = rdBody.querySelector('.loc-mail-edit input'); if(mi) mi.focus();
+        var cb = rdBody.querySelector('[data-card="lsummary"][data-k="x.mailSame"]'); if(cb) cb.checked = false;
+      }
+      return;
+    }
     if(e.target.matches('[data-toggles="mail"]')){
       var card = e.target.closest('.sl-card');
       $$('[data-when="mail"]', card).forEach(function(f){ f.hidden = e.target.checked; });
+      $$('.loc-mail-edit', card).forEach(function(f){ f.hidden = e.target.checked; });
       if(!e.target.checked){ var first = card.querySelector('[data-when="mail"] input'); if(first) first.focus(); }
     }
     if(e.target.id !== 'slDocInput') return;
