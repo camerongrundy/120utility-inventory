@@ -4047,8 +4047,10 @@ body,.app-shell,.app-main,.page-banner{background:var(--bg);}
 
   #pageInventory .mat-body.is-stacked{flex-direction:column !important;align-items:stretch !important;gap:12px !important;padding-top:0 !important;}
   .is-stacked #donutWrap{align-self:center;}
-  #pageInventory .is-stacked #donutWrap,#pageInventory .is-stacked #donutWrap svg{width:128px !important;height:128px !important;}
-  .is-stacked #matLegend{grid-template-columns:8px minmax(0,1fr) auto auto !important;width:100% !important;}
+  #pageInventory .is-stacked #donutWrap,#pageInventory .is-stacked #donutWrap svg{width:156px !important;height:156px !important;}
+  .is-stacked #donutWrap .donut-center-val{font-size:22px !important;}
+  .is-stacked #donutWrap .donut-center-sub{font-size:12px !important;}
+  .is-stacked #matLegend{grid-template-columns:8px minmax(0,1fr) auto auto !important;column-gap:10px !important;width:100% !important;}
   .is-stacked #matLegend .mat-leg-item{padding:5px 6px !important;}
   #pageInventory .mat-body.is-stacked{margin:0 !important;}
 
@@ -5319,7 +5321,7 @@ function fitMatLayout(){
   const leg=document.getElementById('matLegend'), d=document.getElementById('donutWrap');
   if(!leg||!d) return;
   const need=d.offsetWidth+12+leg.scrollWidth;
-  if(need>body.clientWidth+1) body.classList.add('is-stacked');
+  body.classList.add('is-stacked');   // always stacked: legend under a larger donut
   if(!body._ro && window.ResizeObserver){ body._ro=new ResizeObserver(()=>{ clearTimeout(body._t); body._t=setTimeout(fitMatLayout,60); }); body._ro.observe(body.parentNode); }
 }
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>fitMatLayout());
